@@ -95,7 +95,15 @@ Key parameters in `config.py`:
 
 ## Citation
 
-If you use this set of scripts, please also cite the original Tierpsy Tracker repository:
-- [Tierpsy Tracker](https://github.com/Tierpsy/tierpsy-tracker)
+**Main Publication:**
+```
+Yeon J, Chen L, Krishnan N, Bates S, Porwal C, Sengupta P.
+An enteric neuron-expressed variant ionotropic receptor detects ingested salts to regulate salt stress resistance.
+bioRxiv [Preprint]. 2025 May 8:2025.04.11.648259. doi: 10.1101/2025.04.11.648259. PMID: 40391324; PMCID: PMC12087990.
+```
+
+**Software Dependencies:**
+- [Tierpsy Tracker](https://github.com/Tierpsy/tierpsy-tracker) - Original C. elegans tracking software
+- [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker) - Fork enabling installation in current Python environment
 
 
