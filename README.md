@@ -1,5 +1,5 @@
 # Yeon-2025-pumping-analysis
-Scripts to quantify pumping frequency in "An enteric neuron-expressed ionotropic receptor detects ingested salts to regulate salt stress resistance," Yeon, ..., Sengupta 2025.
+Scripts to quantify pumping frequency in **"An enteric neuron-expressed ionotropic receptor detects ingested salts to regulate salt stress resistance"**, *Yeon, ..., Sengupta 2025*.
 
 This set of scripts analyzes pharyngeal pumping behavior in *C. elegans* from video recordings. The analysis pipeline generates kymographs (time-space plots) that visualize intensity changes along the worm's body over time, enabling quantitative measurement of pumping rates.
 
