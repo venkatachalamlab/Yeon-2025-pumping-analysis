@@ -29,6 +29,12 @@ The analysis consists of two main steps:
 
 ## Usage
 
+### 0. HDF5 files structure
+
+The `.h5` files loaded are supposed to have the following keys/paths inside them:
+
+- `times`: is an 1D numpy array (`shape=(n_frames,)`) corresponding to the unix-timestamp of capturing each frame
+- `data`: is a 3D numpy array (`shape=(n_frames, width, height)`) corresponding to frames at each time index
 
 ### 1. Configure Data Path
 
