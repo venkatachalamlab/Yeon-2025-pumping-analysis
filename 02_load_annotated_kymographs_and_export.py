@@ -144,7 +144,9 @@ if __name__ == "__main__":
     for label_section, T_lower, T_upper in TIME_INTERVALS.items():
         for fp_npz in tqdm(fps_cases):
             # File paths
-            condition, strain, _, filename = fp_npz.split(os.sep)[2:]
+            # condition, strain, _, filename = fp_npz.split(os.sep)[2:]
+            filename = fp_npz.split(os.sep)[-1]
+            condition, strain, _ = filename.split('_', 2)
             fp_annotated = os.path.join(
                 FP_PUMPING_ANALYSIS,
                 f"{condition}_{strain}_{filename[:-4]}_annotated.png"
