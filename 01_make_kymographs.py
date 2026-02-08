@@ -849,7 +849,7 @@ if __name__ == "__main__":
     ))
     print(f"Found {len(fps_cases)} cases")
     if len(fps_cases) == 0:
-        raise ValueError("No NPZ files found in {FP_PUMPING_EXTRACTS}")
+        raise ValueError(f"No NPZ files found in {FP_PUMPING_EXTRACTS}")
 
     # Generate aligned kymograph images for manual annotation
     for fp_npz in tqdm(fps_cases):

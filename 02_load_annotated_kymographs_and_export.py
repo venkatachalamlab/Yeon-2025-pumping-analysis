@@ -137,7 +137,7 @@ if __name__ == "__main__":
     ))
     print(f"Found {len(fps_cases)} cases")
     if len(fps_cases) == 0:
-        raise ValueError("No NPZ files found in {FP_WRITE_FOLDER}")
+        raise ValueError(f"No NPZ files found in {FP_PUMPING_EXTRACTS}")
 
     ###################################
     # Process annotated kymographs and extract pumping rate data

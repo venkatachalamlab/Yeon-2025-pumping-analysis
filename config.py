@@ -40,7 +40,9 @@ FRAMES_PER_SECOND = 40.0  # Recording frame rate (Hz) - higher rates capture fas
 # Default paths (can be overridden in scripts)
 # MANUAL PART! -> you need to add the folder path manually.
 # Set this to your data directory containing worm behavior recordings
-FP_READ_FOLDER = "/path/to/your/worm_behavior_recordings"  # Root folder containing worm behavior recordings (*_behavior subfolders)
+FP_READ_FOLDER = os.path.relpath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+)  # Root folder containing worm behavior recordings (*_behavior subfolders)
 # Check that the path is set correctly
 if FP_READ_FOLDER == "/path/to/your/worm_behavior_recordings":
     raise ValueError("Please update FP_READ_FOLDER in config.py to point to your actual data directory. Current value is a placeholder.")
