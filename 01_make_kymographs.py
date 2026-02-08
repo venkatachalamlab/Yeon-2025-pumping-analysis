@@ -380,7 +380,7 @@ def load_and_align_kymograph(fp_npz, scale_roll=1.0, il=130, ir=200):
     # Return
     return intensities_skeleton_normals_avg, intensities_skeleton_normals_avg_rolled
 
-def process_kymograph_segment(idx_start, idx_end, indices_skeleton_reverse=set(), condition=None, strain=None):
+def process_kymograph_segment(idx_start, idx_end, indices_skeleton_reverse=set(), worm_id=None, condition=None, strain=None):
     """
     Process a video segment to generate kymographs and quality control videos.
     
@@ -399,7 +399,7 @@ def process_kymograph_segment(idx_start, idx_end, indices_skeleton_reverse=set()
     INDEX_START = idx_start
     INDICES_TO_CONSIDER = np.arange(idx_start, idx_end, 1)
     NT = len(INDICES_TO_CONSIDER)
-    _PREFIX = f"{condition}_{strain}_pumping_{str(idx_start).zfill(8)}_{str(idx_end).zfill(8)}_"
+    _PREFIX = f"{worm_id}_{condition}_{strain}_pumping_{str(idx_start).zfill(8)}_{str(idx_end).zfill(8)}_"
     FP_WRITE_VIDEO_FOREGROUND = os.path.join( FP_PUMPING_EXTRACTS, f"{_PREFIX}movie_foreground.mp4" )  # Path to the video file to write masked foreground
     FP_WRITE_VIDEO_WORMMASK = os.path.join( FP_PUMPING_EXTRACTS, f"{_PREFIX}movie_worm_mask.mp4" )  # Path to the video file to write worm mask video
     FP_WRITE_VIDEO_WORMSKELETON = os.path.join( FP_PUMPING_EXTRACTS, f"{_PREFIX}movie_worm_skeleton.mp4" )  # Path to the video file to write worm mask video
@@ -768,10 +768,10 @@ if __name__ == "__main__":
     recording_states = list()
     for file, n in zip(files_beh, series_beh.ns):
         name_recording = file.filename.split(os.sep)[-2]
-        condition, strain = name_recording.split("_")[:2]
-        recording_states.append((condition, strain))
+        worm_id, condition, strain = name_recording.split("_")[:3]
         if name_recording not in ns_per_recording:
             ns_per_recording[name_recording] = n
+            recording_states.append((worm_id, condition, strain))
         else:
             ns_per_recording[name_recording] += n
     indices_per_recording = np.array([0] + [
@@ -802,18 +802,18 @@ if __name__ == "__main__":
     # MANUAL PART! -> you need to add the indices manually if needed.
 
     # Make videos, kymographs and store data for all
-    for (idx_start, idx_end), (condition, strain) in zip(indices_inbetween_pairs,recording_states):
+    for (idx_start, idx_end), (worm_id, condition, strain) in zip(indices_inbetween_pairs,recording_states):
         print(f"##### {datetime.datetime.now()}  Interval processing: {str(idx_start).zfill(8)}_{str(idx_end).zfill(8)}")
         # Extract all
         key = (idx_start, idx_end)
         ## Create Paths
         fp_read_pumping_kymograph = os.path.join(
             FP_PUMPING_EXTRACTS,
-            f"{condition}_{strain}_pumping_{str(idx_start).zfill(8)}_{str(idx_end).zfill(8)}_kymograph_all.npz"
+            f"{worm_id}_{condition}_{strain}_pumping_{str(idx_start).zfill(8)}_{str(idx_end).zfill(8)}_kymograph_all.npz"
         )
         fp_write_pumping_kymograph_png = os.path.join(
             FP_PUMPING_EXTRACTS,
-            f"{condition}_{strain}_pumping_{str(idx_start).zfill(8)}_{str(idx_end).zfill(8)}_kymograph_normals_true.png"
+            f"{worm_id}_{condition}_{strain}_pumping_{str(idx_start).zfill(8)}_{str(idx_end).zfill(8)}_kymograph_normals_true.png"
         )
         # Skip if exists
         if os.path.exists(fp_write_pumping_kymograph_png):
@@ -823,7 +823,7 @@ if __name__ == "__main__":
         print(f"####  {datetime.datetime.now()} Procesing interval: {str(idx_start).zfill(8)}-{str(idx_end).zfill(8)}")
         print("####"*20)
         # Do the thing
-        process_kymograph_segment(idx_start, idx_end, indices_skeleton_reverse=indices_skeleton_reverse[key], condition=condition, strain=strain )
+        process_kymograph_segment(idx_start, idx_end, indices_skeleton_reverse=indices_skeleton_reverse[key], worm_id=worm_id, condition=condition, strain=strain )
         print("####"*20)
         print(f"####  {datetime.datetime.now()} Finished!")
         print("####"*20)
