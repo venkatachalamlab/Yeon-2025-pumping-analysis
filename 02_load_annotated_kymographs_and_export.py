@@ -93,6 +93,9 @@ def extract_annotations_from_kymograph(fp_read, T_lower=0, T_max=40*120):
     food_entry_kymograph_annotations = np.array(
         Image.open(fp_read)
     )[:, T_lower:T_max, :3]
+
+    if food_entry_kymograph_annotations.size == 0:
+        return None, None, None
     
     # Extract pumping events (red pixels)
     indices_pumps = find_annotation_pixels(food_entry_kymograph_annotations, KYMOGRAPH_ANNOTATION_COLOR_RED)
@@ -141,28 +144,31 @@ if __name__ == "__main__":
     _data_points_missing = []  # Track datasets with missing annotations
     _data_points = []  # Store pumping rate measurements
 
-    for label_section, T_lower, T_upper in TIME_INTERVALS.items():
+    for label_section, (T_lower, T_upper) in TIME_INTERVALS.items():
         for fp_npz in tqdm(fps_cases):
             # File paths
             # condition, strain, _, filename = fp_npz.split(os.sep)[2:]
             filename = fp_npz.split(os.sep)[-1]
-            condition, strain, _ = filename.split('_', 2)
+            worm_id, condition, strain, _ = filename.split('_', 3)
             fp_annotated = os.path.join(
                 FP_PUMPING_ANALYSIS,
-                f"{condition}_{strain}_{filename[:-4]}_annotated.png"
+                f"{filename[:-4]}_annotated.png"
             )
             # If exists
             if not os.path.exists(fp_annotated):
+                print(f"WARNING: No annotated kymograph found for {fp_annotated}")
                 continue
             # Load
             with np.load(fp_npz) as in_file:
                 times = in_file['timestamps']
             ## Annotations
             img_shape, indices_pumps, indices_exclude = extract_annotations_from_kymograph( fp_annotated, T_lower, T_upper )
+            if img_shape is None:
+                continue
             # Store missing indices
             _data_points_missing.append((
                 label_section,
-                condition, strain,
+                worm_id, condition, strain,
                 img_shape[1], len(indices_exclude),
                 fp_annotated, fp_npz
             ))
@@ -202,7 +208,7 @@ if __name__ == "__main__":
                     _n_pumps = array_pumps[i:j].sum()
                     _data_points.append((
                         label_section,
-                        condition, strain,
+                        worm_id, condition, strain,
                         _duration, _n_pumps, _n_pumps/_duration,
                         i, j, _n,
                         fp_annotated, fp_npz
@@ -222,7 +228,7 @@ if __name__ == "__main__":
         _data_points_missing,
         columns=[
             'label_section',
-            'condition', 'strain',
+            'worm_id', 'condition', 'strain',
             'n_frames', 'n_frames_nontracking',
             'fp_annotation', 'fp_data'
         ]
@@ -235,7 +241,7 @@ if __name__ == "__main__":
         _data_points,
         columns=[
             'label_section',
-            'condition', 'strain',
+            'worm_id', 'condition', 'strain',
             'window_duration_seconds', 'window_pumps',
             'window_pumping_rate_Hz',
             'idx_start', 'idx_end', 'n_indices',
