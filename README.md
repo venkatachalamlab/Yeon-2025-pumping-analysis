@@ -1,7 +1,8 @@
 # Yeon-2025-pumping-analysis
-Scripts to quantify pumping frequency in **"An enteric neuron-expressed ionotropic receptor detects ingested salts to regulate salt stress resistance"**, *Yeon, ..., Sengupta 2025*.
 
-This set of scripts analyzes pharyngeal pumping behavior in *C. elegans* from video recordings. The analysis pipeline generates kymographs (time-space plots) that visualize intensity changes along the worm's body over time, enabling quantitative measurement of pumping rates.
+Scripts to quantify pharyngeal pumping frequency in *C. elegans* from video recordings, as described in **"An enteric neuron-expressed ionotropic receptor detects ingested salts to regulate salt stress resistance"**, *Yeon, ..., Sengupta 2025*.
+
+The analysis pipeline generates kymographs (time-space plots) that visualize intensity changes along the worm's body over time, enabling quantitative measurement of pumping rates.
 
 ## Overview
 
@@ -10,106 +11,207 @@ The analysis consists of two main steps:
 1. **Kymograph Generation** (`01_make_kymographs.py`): Processes video recordings to create kymographs showing pharyngeal pumping patterns
 2. **Annotation Analysis** (`02_load_annotated_kymographs_and_export.py`): Extracts quantitative pumping rate data from manually annotated kymographs
 
-## Requirements
+Supporting files:
+- `config.py`: All configurable parameters (file paths, thresholds, imaging parameters)
+- `utils.py`: Utility functions for video I/O, data loading, and image processing classes
 
-- Python 3.8+
-- See `requirements.txt` for all dependencies
-- [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker) for C. elegans computer vision. My fork of [Tierpsy Tracker](https://github.com/Tierpsy/tierpsy-tracker) that enabled installation in your current python env.
+## System Requirements
 
+### Software Dependencies
+
+- Python 3.8
+- conda (Anaconda or Miniconda) for environment management
+- See `requirements.txt` for all Python package dependencies:
+  - numpy 1.24.4
+  - scipy 1.10.1
+  - pandas 2.0.3
+  - matplotlib 3.7.5
+  - opencv-python 4.13.0.90
+  - Pillow 10.4.0
+  - h5py 3.11.0
+  - tqdm 4.67.2
+- [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker) for *C. elegans* computer vision (included in this repository under `tierpsy-tracker/`)
+
+### Operating System
+
+- **Tested on:** Ubuntu 24.04 LTS (Linux kernel 6.17)
+- **Expected to work on:** Linux, macOS, Windows (with conda)
+
+### Versions Tested
+
+- Python 3.8.20
+- All dependency versions as listed in `requirements.txt`
+
+### Non-standard Hardware
+
+No non-standard hardware is required. The software runs on a standard desktop computer.
 
 ## Installation
 
-1. Download this set of scripts
-2. Install dependencies:
+1. Create and activate a conda environment:
+   ```bash
+   conda create -n pumping python=3.8
+   conda activate pumping
+   ```
+
+2. Install Python dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-3. Install Tierpsy Tracker:
-   By following [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker) or try the original repo [Tierpsy Tracker](https://github.com/Tierpsy/tierpsy-tracker).
 
-## Usage
+3. Install Tierpsy Tracker (included in this repository under `tierpsy-tracker/`):
+   ```bash
+   cd tierpsy-tracker
+   pip install -r requirements.txt
+   pip install -e .
+   cd ..
+   ```
 
-### 0. HDF5 files structure
+   Alternatively, you can clone and install from the GitHub repository:
+   - [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker) (fork enabling installation in current Python environment)
+   - [Tierpsy/Tierpsy Tracker](https://github.com/Tierpsy/tierpsy-tracker) (original repository)
 
-The `.h5` files loaded are supposed to have the following keys/paths inside them:
+### Typical Install Time
 
-- `times`: is an 1D numpy array (`shape=(n_frames,)`) corresponding to the unix-timestamp of capturing each frame
-- `data`: is a 3D numpy array (`shape=(n_frames, width, height)`) corresponding to frames at each time index
+Approximately 5--10 minutes on a normal desktop computer with a broadband internet connection (most time is spent downloading packages).
 
-### 1. Configure Data Path
+## Demo
 
-Edit `config.py` and set `FP_READ_FOLDER` to point to your data directory:
+A small demo dataset is included under `data/` containing two short recordings (400 frames each, ~10 seconds at 40 fps):
 
-```python
-FP_READ_FOLDER = "/path/to/your/worm_behavior_recordings"
-```
+- `data/worm1_50mM_N2_behavior/000_010.h5` -- Wild-type (N2) worm in 50 mM NaCl
+- `data/worm2_50mM_glr9_behavior/000_010.h5` -- *glr-9* mutant worm in 50 mM NaCl
 
-### 2. Data Structure
+### Running the Demo
 
-Organize your data as follows:
-```
-your_data_folder/
-├── WORM1_behavior/
-│   ├── 000.h5
-│   ├── 001.h5
-│   └── ...
-├── WORM2_behavior/
-│   ├── 000.h5
-│   └── ...
-└── metadata/
-```
-
-### 3. Generate Kymographs
+**Step 1: Generate kymographs**
 
 ```bash
+conda activate pumping
 python 01_make_kymographs.py
 ```
 
-This creates:
-- Kymograph images (PNG)
-- Processed videos with skeleton overlays (MP4)
-- Numerical data (NPZ, MAT files)
+This produces output in `data/pumping_extracts/`:
+- Kymograph images (PNG): intensity along the skeleton and along normals, both raw and rescaled
+- Quality control videos (MP4): foreground masks, worm masks, and skeleton overlays
+- Numerical data (NPZ, MAT): timestamps, intensities, and distance arrays
 
-### 4. Manual Annotation
+Aligned kymograph images for annotation are saved in `data/pumping_analysis/`.
 
-Manually annotate the generated kymograph images using image editing software, e.g. Paint:
-- **Red pixels**: Mark pumping events
-- **Green pixels**: Mark regions to exclude from analysis
+**Step 2: Manually annotate kymographs**
 
-Make sure to use "pen" tools, e.g. no brush or patterned coloring. And also add the RGB values the **red** and **green** colors used, in the `config.py` file. E.g.
-- `KYMOGRAPH_ANNOTATION_COLOR_RED = np.array([237, 28, 36], dtype=np.float32)` corresponds to `rgb(237,28,36)`.
+Annotate the generated kymograph PNG images using image editing software (e.g., Microsoft Paint):
+- **Red pixels** (`rgb(237, 28, 36)`): Mark pumping events
+- **Green pixels** (`rgb(34, 177, 76)`): Mark regions to exclude from analysis
 
-### 5. Extract Pumping Rates
+Use solid "pen" tools (not brushes or patterned fills). Save the annotated images with `_annotated` appended to the filename (e.g., `*_kymograph_all_annotated.png`).
+
+Pre-annotated kymograph images for the demo data are included in `data/pumping_analysis/`.
+
+**Step 3: Extract pumping rates**
 
 ```bash
 python 02_load_annotated_kymographs_and_export.py
 ```
 
-This generates CSV files with pumping rate measurements.
+### Expected Output
 
-- `rates_per_15s_windows.csv`: Pumping rates for 15-second time windows
-- `rates_per_dataset.csv`: Average pumping rates per dataset
-- `notracking_indices.csv`: Summary of excluded regions
+Three CSV files are generated in `data/pumping_analysis/`:
 
-## Configuration
+| File | Description |
+|------|-------------|
+| `rates_per_15s_windows.csv` | Pumping rates for each 15-second time window |
+| `rates_per_dataset.csv` | Average pumping rates per worm/dataset |
+| `notracking_indices.csv` | Summary of excluded/non-tracking regions |
+
+Expected pumping rates for the demo data:
+- **N2 (wild-type):** ~4.0 Hz (44 pumps in ~10.9 seconds)
+- **glr-9 mutant:** ~4.9 Hz (43 pumps in ~8.7 seconds)
+
+### Expected Run Time
+
+- **Step 1** (kymograph generation): ~5--10 minutes per recording on a normal desktop computer
+- **Step 3** (annotation analysis): less than 1 minute
+
+## Instructions for Use
+
+### Running on Your Own Data
+
+1. **Organize your data** in the following folder structure:
+   ```
+   your_data_folder/
+   ├── WORMID_CONDITION_STRAIN_behavior/
+   │   ├── 000.h5
+   │   ├── 001.h5
+   │   └── ...
+   ├── WORMID_CONDITION_STRAIN_behavior/
+   │   ├── 000.h5
+   │   └── ...
+   └── metadata/          (created automatically)
+   ```
+
+   Each `.h5` file must contain:
+   - `times`: 1D numpy array (`shape=(n_frames,)`) of unix timestamps for each frame
+   - `data`: 3D numpy array (`shape=(n_frames, height, width)`) of grayscale video frames
+
+2. **Configure the data path** in `config.py`:
+   ```python
+   FP_READ_FOLDER = "/path/to/your_data_folder"
+   ```
+
+3. **Adjust imaging parameters** in `config.py` if your microscope setup differs:
+   - `PIXELS_PER_MM`: Microscope calibration (pixels per millimeter)
+   - `FRAMES_PER_SECOND`: Video frame rate (Hz)
+   - `MASK_THRESHOLD_FOREGROUND`: Intensity threshold for worm segmentation
+
+4. **Run the pipeline** as described in the Demo section above (Steps 1--3).
+
+5. **Head-tail correction** (if needed): In `01_make_kymographs.py`, the `indices_skeleton_reverse` dictionary allows manual correction of frames where the skeleton head-tail orientation is incorrect. Add frame indices where the orientation flips:
+   ```python
+   indices_skeleton_reverse[(start_frame, end_frame)] = {frame1, frame2, ...}
+   ```
+
+### Configuration
 
 Key parameters in `config.py`:
-- `FRAMES_PER_SECOND`: Video frame rate (default: 40 Hz)
-- `UM_PER_PIXEL`: Micrometers per pixel calibration
-- `SKELETON_N_SEGMENTS`: Number of skeleton points (default: 101)
-- `WINDOW_SIZE`: Analysis window size in frames (default: 600 = 15 seconds)
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `FRAMES_PER_SECOND` | 40.0 | Video frame rate (Hz) |
+| `PIXELS_PER_MM` | 820 | Microscope calibration |
+| `UM_PER_PIXEL` | 1.22 | Micrometers per pixel (derived) |
+| `SKELETON_N_SEGMENTS` | 101 | Number of skeleton points |
+| `WINDOW_SIZE` | 600 | Analysis window (15 s at 40 fps) |
+| `MASK_THRESHOLD_FOREGROUND` | 110 | Worm segmentation threshold |
+
+## Code Description
+
+A complete description of the analysis algorithms is provided in the **Methods** section of the manuscript. In brief:
+
+1. **Worm segmentation:** Foreground masking via intensity thresholding and connected component analysis, followed by morphological refinement.
+2. **Skeleton extraction:** Centerline tracing using the Tierpsy Tracker computer vision library, with temporal smoothing and spline interpolation.
+3. **Kymograph generation:** Intensity sampling along the skeleton and perpendicular normals, producing time-space plots.
+4. **Pumping quantification:** Manual annotation of pumping events on kymographs, followed by automated extraction of pumping rates in configurable time windows.
+
+## License
+
+This software is released under the [MIT License](LICENSE), approved by the [Open Source Initiative](https://opensource.org/licenses/MIT).
+
+## Repository
+
+Source code is available at: https://github.com/venkatachalamlab/Yeon-2025-pumping-analysis
 
 ## Citation
 
 **Main Publication:**
 ```
 Yeon J, Chen L, Krishnan N, Bates S, Porwal C, Sengupta P.
-An enteric neuron-expressed variant ionotropic receptor detects ingested salts to regulate salt stress resistance.
-bioRxiv [Preprint]. 2025 May 8:2025.04.11.648259. doi: 10.1101/2025.04.11.648259. PMID: 40391324; PMCID: PMC12087990.
+An enteric neuron-expressed variant ionotropic receptor detects ingested salts
+to regulate salt stress resistance.
+bioRxiv [Preprint]. 2025 May 8:2025.04.11.648259.
+doi: 10.1101/2025.04.11.648259. PMID: 40391324; PMCID: PMC12087990.
 ```
 
 **Software Dependencies:**
-- [Tierpsy Tracker](https://github.com/Tierpsy/tierpsy-tracker) - Original C. elegans tracking software
-- [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker) - Fork enabling installation in current Python environment
-
-
+- [Tierpsy Tracker](https://github.com/Tierpsy/tierpsy-tracker) -- Original *C. elegans* tracking software
+- [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker) -- Fork enabling installation in current Python environment
