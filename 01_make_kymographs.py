@@ -637,7 +637,6 @@ def process_kymograph_segment(idx_start, idx_end, indices_skeleton_reverse=set()
         plt.xlabel("Milliseconds")
         # Y ticks
         _n = kymograph.shape[0]
-        print(_n)
         _ticks = np.arange(len(dists_to_interpolate_px))[:_n]
         _labels = ( dists_to_interpolate_px * UM_PER_PIXEL ).round(1)[-_n:]
         plt.yticks(ticks=_ticks[::TICK_INTERVAL_DISTANCE], labels=_labels[::TICK_INTERVAL_DISTANCE])
@@ -723,12 +722,6 @@ def process_kymograph_segment(idx_start, idx_end, indices_skeleton_reverse=set()
 # processes the kymographs, and saves the results.
 #######################################################################
 if __name__ == "__main__":
-    # Check if data path is configured
-    if FP_READ_FOLDER == "/path/to/your/worm_behavior_recordings":
-        print("ERROR: Please update FP_READ_FOLDER in config.py to point to your data directory.")
-        print("Current value is a placeholder. Exiting...")
-        exit(1)
-    
     # Check if data directory exists
     if not os.path.exists(FP_READ_FOLDER):
         print(f"ERROR: Data directory does not exist: {FP_READ_FOLDER}")

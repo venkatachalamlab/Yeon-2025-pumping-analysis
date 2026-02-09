@@ -115,12 +115,6 @@ def extract_annotations_from_kymograph(fp_read, T_lower=0, T_max=40*120):
 #######################################################################
 
 if __name__ == "__main__":
-    # Check if data path is configured
-    if FP_READ_FOLDER == "/path/to/your/worm_behavior_recordings":
-        print("ERROR: Please update FP_READ_FOLDER in config.py to point to your data directory.")
-        print("Current value is a placeholder. Exiting...")
-        exit(1)
-    
     # Check if data directory exists
     if not os.path.exists(FP_READ_FOLDER):
         print(f"ERROR: Data directory does not exist: {FP_READ_FOLDER}")
