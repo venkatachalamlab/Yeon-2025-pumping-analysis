@@ -77,10 +77,29 @@ Approximately 5--10 minutes on a normal desktop computer with a broadband intern
 
 ## Demo
 
-A small demo dataset is included under `data/` containing two short recordings (400 frames each, ~10 seconds at 40 fps):
+### Sample Data
+
+A small demo dataset containing two short recordings (400 frames each, ~10 seconds at 40 fps) is available as a ZIP file from the [GitHub Releases page](https://github.com/venkatachalamlab/Yeon-2025-pumping-analysis/releases/tag/v1.0).
+
+**Automatic download:** Running `python 01_make_kymographs.py` will automatically download and extract the sample data if the `data/` directory does not exist.
+
+**Manual download:** You can also download and extract the sample data manually:
+
+```bash
+# Download the sample data ZIP file
+wget https://github.com/venkatachalamlab/Yeon-2025-pumping-analysis/releases/download/v1.0/data.zip
+
+# Create the data directory and extract
+mkdir -p data
+unzip data.zip -d data
+rm data.zip
+```
+
+After extraction, the `data/` directory should contain:
 
 - `data/worm1_50mM_N2_behavior/000_010.h5` -- Wild-type (N2) worm in 50 mM NaCl
 - `data/worm2_50mM_glr9_behavior/000_010.h5` -- *glr-9* mutant worm in 50 mM NaCl
+- `data/pumping_analysis/` -- Pre-annotated kymograph images for the demo
 
 ### Running the Demo
 

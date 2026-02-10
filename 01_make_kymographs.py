@@ -721,12 +721,57 @@ def process_kymograph_segment(idx_start, idx_end, indices_skeleton_reverse=set()
 # This function is the entry point for the script. It loads the files,
 # processes the kymographs, and saves the results.
 #######################################################################
-if __name__ == "__main__":
-    # Check if data directory exists
-    if not os.path.exists(FP_READ_FOLDER):
-        print(f"ERROR: Data directory does not exist: {FP_READ_FOLDER}")
-        print("Please check the path in config.py. Exiting...")
+def download_sample_data(data_dir):
+    """
+    Download and extract the sample data from the GitHub release.
+    
+    The ZIP file is downloaded from the Yeon-2025-pumping-analysis GitHub
+    release page and extracted into the data directory.
+    
+    Args:
+        data_dir: Path to the data directory where files will be extracted
+    """
+    import urllib.request
+    import zipfile
+    
+    DATA_URL = "https://github.com/venkatachalamlab/Yeon-2025-pumping-analysis/releases/download/v1.0/data.zip"
+    zip_path = os.path.join(os.path.dirname(data_dir), "data.zip")
+    
+    print(f"Sample data not found at: {data_dir}")
+    print(f"Downloading sample data from GitHub release...")
+    print(f"  URL: {DATA_URL}")
+    
+    try:
+        urllib.request.urlretrieve(DATA_URL, zip_path)
+        print(f"  Download complete: {zip_path}")
+    except Exception as e:
+        print(f"ERROR: Failed to download sample data: {e}")
+        print(f"Please download manually from: {DATA_URL}")
+        print(f"Then extract into: {data_dir}")
         exit(1)
+    
+    print(f"Extracting to: {data_dir}")
+    os.makedirs(data_dir, exist_ok=True)
+    try:
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(data_dir)
+        print(f"  Extraction complete.")
+    except Exception as e:
+        print(f"ERROR: Failed to extract sample data: {e}")
+        exit(1)
+    finally:
+        # Clean up the ZIP file
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
+            print(f"  Cleaned up: {zip_path}")
+    
+    print(f"Sample data is ready at: {data_dir}")
+
+
+if __name__ == "__main__":
+    # Check if data directory exists; if not, download sample data
+    if not os.path.exists(FP_READ_FOLDER):
+        download_sample_data(FP_READ_FOLDER)
     
     print(f"Starting kymograph generation for data in: {FP_READ_FOLDER}")
     
