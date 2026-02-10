@@ -728,49 +728,80 @@ def download_sample_data(data_dir):
     The ZIP file is downloaded from the Yeon-2025-pumping-analysis GitHub
     release page and extracted into the data directory.
     
+    Compatible with Windows, macOS, and Linux. Uses only Python standard
+    library modules (plus tqdm for progress display).
+    
     Args:
         data_dir: Path to the data directory where files will be extracted
     """
     import urllib.request
     import zipfile
+    import tempfile
     
     DATA_URL = "https://github.com/venkatachalamlab/Yeon-2025-pumping-analysis/releases/download/v1.0/data.zip"
-    zip_path = os.path.join(os.path.dirname(data_dir), "data.zip")
+    CHUNK_SIZE = 8192  # 8 KB chunks for streaming download
     
     print(f"Sample data not found at: {data_dir}")
     print(f"Downloading sample data from GitHub release...")
     print(f"  URL: {DATA_URL}")
     
+    # Use a temporary file for the download (cross-platform safe)
+    tmp_fd, zip_path = tempfile.mkstemp(suffix=".zip")
+    os.close(tmp_fd)  # Close the file descriptor; we'll open it ourselves
+    
     try:
-        urllib.request.urlretrieve(DATA_URL, zip_path)
-        print(f"  Download complete: {zip_path}")
+        # Download with progress bar
+        response = urllib.request.urlopen(DATA_URL)
+        total_size = int(response.headers.get("Content-Length", 0))
+        
+        with open(zip_path, "wb") as f:
+            with tqdm(total=total_size, unit="B", unit_scale=True,
+                      unit_divisor=1024, desc="Downloading") as pbar:
+                while True:
+                    chunk = response.read(CHUNK_SIZE)
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    pbar.update(len(chunk))
+        
+        print(f"  Download complete.")
     except Exception as e:
         print(f"ERROR: Failed to download sample data: {e}")
-        print(f"Please download manually from: {DATA_URL}")
+        print(f"Please download manually from:")
+        print(f"  {DATA_URL}")
         print(f"Then extract into: {data_dir}")
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
         exit(1)
     
+    # Extract with progress bar
     print(f"Extracting to: {data_dir}")
     os.makedirs(data_dir, exist_ok=True)
     try:
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(data_dir)
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            members = zip_ref.infolist()
+            with tqdm(total=len(members), unit="file", desc="Extracting") as pbar:
+                for member in members:
+                    zip_ref.extract(member, data_dir)
+                    pbar.update(1)
         print(f"  Extraction complete.")
     except Exception as e:
         print(f"ERROR: Failed to extract sample data: {e}")
         exit(1)
     finally:
-        # Clean up the ZIP file
+        # Clean up the temporary ZIP file
         if os.path.exists(zip_path):
             os.remove(zip_path)
-            print(f"  Cleaned up: {zip_path}")
     
     print(f"Sample data is ready at: {data_dir}")
 
 
 if __name__ == "__main__":
-    # Check if data directory exists; if not, download sample data
-    if not os.path.exists(FP_READ_FOLDER):
+    # Check if any behavior recording folders exist in the data directory.
+    # Note: config.py creates data/ and its subdirectories on import, so
+    # we check for actual *_behavior folders with .h5 files instead.
+    _behavior_folders = glob(os.path.join(FP_READ_FOLDER, "*_behavior"))
+    if len(_behavior_folders) == 0:
         download_sample_data(FP_READ_FOLDER)
     
     print(f"Starting kymograph generation for data in: {FP_READ_FOLDER}")
