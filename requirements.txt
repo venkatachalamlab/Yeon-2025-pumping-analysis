@@ -7,12 +7,27 @@ matplotlib==3.7.5
 # Computer vision and image processing
 opencv-python==4.13.0.90
 Pillow==10.4.0
+scikit-image
 
 # Data storage and I/O
 h5py==3.11.0
+tables
 
 # Progress bars and utilities
 tqdm==4.67.2
+requests
+
+# Machine learning and statistics
+keras==2.1.5
+scikit-learn
+statsmodels
+
+# Compilation and performance
+cython
+numba
+
+# GUI (required by Tierpsy Tracker)
+pyqt5
 
 # C. elegans computer vision library
 # Install tierpsy tracker separately by following the instructions in README.md

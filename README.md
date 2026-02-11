@@ -34,7 +34,7 @@ Supporting files:
 
 ### Operating System
 
-- **Tested on:** Ubuntu 24.04 LTS (Linux kernel 6.17)
+- **Tested on:** Ubuntu 24.04 LTS (Linux kernel 6.17), Windows 10/11
 - **Expected to work on:** Linux, macOS, Windows (with conda)
 
 ### Versions Tested
@@ -47,6 +47,8 @@ Supporting files:
 No non-standard hardware is required. The software runs on a standard desktop computer.
 
 ## Installation
+
+> **Windows users:** Clone or extract the repository to a **short path** (e.g., `C:\pumping\`). The Tierpsy Tracker Cython extension build generates deeply nested paths that can exceed the Windows 260-character path limit (`MAX_PATH`), causing linker errors during installation. Additionally, [Microsoft Visual C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) are required to compile the Cython extension.
 
 1. Create and activate a conda environment:
    ```bash
@@ -62,7 +64,6 @@ No non-standard hardware is required. The software runs on a standard desktop co
 3. Install Tierpsy Tracker (included in this repository under `tierpsy-tracker/`):
    ```bash
    cd tierpsy-tracker
-   pip install -r requirements.txt
    pip install -e .
    cd ..
    ```
