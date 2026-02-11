@@ -30,7 +30,7 @@ Supporting files:
   - Pillow 10.4.0
   - h5py 3.11.0
   - tqdm 4.67.2
-- [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker) for *C. elegans* computer vision (included in this repository under `tierpsy-tracker/`)
+- [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker) for *C. elegans* computer vision -- a fork of the [original Tierpsy Tracker](https://github.com/Tierpsy/tierpsy-tracker) modified for Python module installation; cloned and included in this repository under `tierpsy-tracker/`
 
 ### Operating System
 
@@ -61,16 +61,12 @@ No non-standard hardware is required. The software runs on a standard desktop co
    pip install -r requirements.txt
    ```
 
-3. Install Tierpsy Tracker (included in this repository under `tierpsy-tracker/`):
+3. Install Tierpsy Tracker. The `tierpsy-tracker/` folder included in this repository is a clone of [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker), a fork of the [original Tierpsy Tracker](https://github.com/Tierpsy/tierpsy-tracker) modified to allow installation as a Python module via `pip install -e .`:
    ```bash
    cd tierpsy-tracker
    pip install -e .
    cd ..
    ```
-
-   Alternatively, you can clone and install from the GitHub repository:
-   - [SinRas/Tierpsy Tracker](https://github.com/SinRas/tierpsy-tracker) (fork enabling installation in current Python environment)
-   - [Tierpsy/Tierpsy Tracker](https://github.com/Tierpsy/tierpsy-tracker) (original repository)
 
 ### Typical Install Time
 
