@@ -1,0 +1,53 @@
+# Note from : https://travis-ci.org/Anaconda-Platform/anaconda-project/
+# language: python sets up virtualenv and pip that we don't need.
+# omitting language gives us ruby stuff. c seems likely to be a minimal setup.
+language: c
+
+notifications:
+  email: false
+
+env : 
+  - TRAVIS_PYTHON_VERSION=3.6
+
+os:
+  - linux
+  #- osx
+
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      MINICONDA_OS=Linux ;
+    else
+      MINICONDA_OS=MacOSX ;
+    fi ;
+    echo "Fetching miniconda for $MINICONDA_OS" ;
+    curl https://repo.continuum.io/miniconda/Miniconda3-latest-$MINICONDA_OS-x86_64.sh -o miniconda.sh
+  
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - source "$HOME"/miniconda/bin/activate root
+  - printenv | sort
+  - conda config --set always_yes yes --set changeps1 no --set auto_update_conda false
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+  
+  # create testing enviroment
+  - conda config --add channels conda-forge 
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION 
+  - source activate test-environment
+  - conda install --file requirements.txt
+  
+  - printenv | sort
+
+  - export PATH=`echo "$PATH" | sed -e s@"$HOME"/miniconda/bin:@@g`
+  - printenv | sort
+
+  # install tierpsy
+  - pip install . -e
+  
+before_script:
+  #download examples
+  - tierpsy_tests --download_examples
+
+script:
+  - tierpsy_tests -h
+  - ierpsy_process -h

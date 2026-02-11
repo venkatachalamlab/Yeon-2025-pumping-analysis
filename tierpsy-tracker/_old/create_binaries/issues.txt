@@ -1,0 +1,37 @@
+* There is still problems with pyqt5...
+It seems pyinstaller cannot work with the anaconda pyqt5 version. Luckly there are pip installers for all teh libraries. Execute before running.
+
+pip install numpy matplotlib tables pandas pyqt5 h5py scipy scikit-learn scikit-image seaborn xlrd cython statsmodels numba keras tensorflow opencv-python-headless
+pip install https://github.com/pyinstaller/pyinstaller/tarball/develop
+
+* the pip version of pytables and h5py are not compatible in python 3.5, but they are compatible for 3.6
+
+
+* Version 3.2 does not import correctly pyqt5 in OSX (https://github.com/pyinstaller/pyinstaller/issues/1874). I had to download and install (python setup.py install) the development version (http://www.pyinstaller.org/).
+
+* Got some issue related with different versions of libfreetype.6.dylib.
+I can check this using:
+	sudo find / -name libfreetype.6.dylib -exec otool -L {} \;
+
+I find that I had an old version of PIL, and pyinstaller was pulling libfreetype.6.dylib. I deleted that folder (I installed too a new version of pillow, PIL seems discontinued).
+
+-note: this problem can happends too with the libpng library, in this case it was matplotlib, that is installed with an older version and pyinstaller pull that one for some reason.
+
+* the hidden import h5py._proxy requires quotations ('') in linux/mac but not in windows. Putting quotations in windows will confuse pyinstaller and will not be able to locate the file.
+
+* use the options --windowed in Windows will cause problems in any subprocess. There seem to be some work arounds (https://github.com/pyinstaller/pyinstaller/wiki/Recipe-subprocess), but for the moment I will just leave the annoying background screen in the application.
+
+hiddenimports=['h5py.defs', 'h5py.utils', 'h5py.h5ac', 'h5py._proxy', 
+             'cython', 'sklearn', 'sklearn.neighbors.typedefs'],
+
+* For some reason the 'datas' parameter in analysis is not working. I have to add data to a.datas directly.
+
+
+* I recieve a Intel MKL FATAL ERROR. Solution remove mkl from anaconda (https://github.com/pyinstaller/pyinstaller/issues/2175).
+	conda install nomkl numpy scipy scikit-learn numexpr
+	conda remove mkl mkl-service
+
+* I recieve an error of a missing package 'future'. Just use:
+	conda install futures
+
+* OSX the ffprobe of conda has relative links to the libraries and it is complicated to include in the binary. It is better to use the one of homebrew.

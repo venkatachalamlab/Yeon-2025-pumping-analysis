@@ -1,0 +1,59 @@
+package:
+  name: tierpsy
+  version: "1.5.2a"
+
+source:
+  path: ..
+  #git_rev: "v1.5.0"
+  #git_url: "https://github.com/ver228/tierpsy-tracker"
+
+build:
+  osx_is_app: True
+
+requirements:
+  build:
+    - python=3.6
+    - numpy >=1.14
+    - setuptools
+    - cython
+    
+  run:
+    - python
+    - keras=2.1.5 
+    - opencv=3.4.3
+    - tensorflow=1.0.0  # [unix]
+    - tensorflow        # [windows]
+    - numpy >=1.14
+    - matplotlib 
+    - pytables 
+    - pandas 
+    - pyqt=5.6          # [windows]
+    - pyqt              # [unix]
+    - scipy 
+    - scikit-learn 
+    - scikit-image
+    - statsmodels 
+    - numba
+    - tqdm
+    - requests
+    - ffmpeg
+    
+app:
+  entry: tierpsy_gui
+  summary: Tierpsy Tracker Multi-Worm Tracker
+  type: desk
+
+test:
+  imports:
+    - tierpsy
+    - tierpsy.features.tierpsy_features
+    - tierpsy.features.open_worm_analysis_toolbox
+  commands:
+    - tierpsy_process -h
+    - tierpsy_tests -h
+
+about:
+  home: https://github.com/ver228/tierpsy-tracker
+  license: MIT
+  license_file: LICENSE
+  summary: Tierpsy Tracker Multi-Worm Tracker
