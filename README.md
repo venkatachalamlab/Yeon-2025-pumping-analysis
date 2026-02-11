@@ -70,7 +70,7 @@ No non-standard hardware is required. The software runs on a standard desktop co
 
 ### Typical Install Time
 
-Approximately 5--10 minutes on a normal desktop computer with a broadband internet connection (most time is spent downloading packages).
+Approximately 5 minutes on a standard desktop computer with a broadband internet connection (most of the time is spent downloading packages).
 
 ## Demo
 
@@ -146,8 +146,8 @@ Expected pumping rates for the demo data:
 
 ### Expected Run Time
 
-- **Step 1** (kymograph generation): ~5--10 minutes per recording on a normal desktop computer
-- **Step 3** (annotation analysis): less than 1 minute
+- **Step 1** (kymograph generation): less than 5 minutes for the sample data on a standard desktop computer
+- **Step 3** (annotation analysis): a few seconds
 
 ## Instructions for Use
 
